@@ -7,6 +7,7 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Build;
+import android.text.Layout;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
@@ -367,17 +368,22 @@ public class ExpandableTextView extends TextView
         this.mToggleButton = mToggleButton;
     }
 
+    public final boolean isTextEllipsized() {
+        Layout layout = getLayout();
+        if (layout != null) {
+            int lines = layout.getLineCount();
+            return lines > 0 && layout.getEllipsisCount(lines - 1) > 0;
+        }
+        return false;
+    }
+
     @Override
     protected void onLayout(boolean changed, int left, int top, int right,
                             int bottom) {
         super.onLayout(changed, left, top, right, bottom);
 
         if (mToggleButton != null) {
-            if(getLineCount() >= this.maxLines){
-                mToggleButton.setVisibility(VISIBLE);
-            }else {
-                mToggleButton.setVisibility(GONE);
-            }
+            mToggleButton.setVisibility(isTextEllipsized() || expanded || animating ? VISIBLE : GONE);
         }
     }
 }
